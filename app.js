@@ -1,29 +1,47 @@
+const request = require("request");
 const express = require('express');
 const bodyParser = require('body-parser');
 const { graphqlExpress, graphiqlExpress } = require('apollo-server-express');
 const { makeExecutableSchema } = require('graphql-tools');
 
-// Some fake data
-const books = [
-  {
-    title: "Harry Potter and the Sorcerer's stone",
-    author: 'J.K. Rowling',
-  },
-  {
-    title: 'Jurassic Park',
-    author: 'Michael Crichton',
-  },
-];
+var livres;
+
+    request({
+        url: "http://localhost/GraphQL/GraphqlTp3/api.php/livres/",
+        json: true
+    }, function(err, res, data) {
+        if(err) {
+            console.error(err);
+        }
+        livres = data;
+        console.log(livres);
+    });    
+
+
+var auteurs;
+
+    request({
+        url: "http://localhost/GraphQL/GraphqlTp3/api.php/auteurs/",
+        json: true
+    }, function(err, res, data) {
+        if(err) {
+            console.error(err);
+        }
+        auteurs = data;
+        console.log(livres);
+    });    
+
 
 // The GraphQL schema in string form
 const typeDefs = `
-  type Query { books: [Book] }
-  type Book { title: String, author: String }
+  type Query { livres:[Livre], auteurs:[Auteur] }
+  type Livre { id: String, titre: String, date_parution: String, genre: String, prix: String, id_auteur: String }
+  type Auteur { id: String, nom: String, prenom: String, datenaiss: String }
 `;
 
 // The resolvers
 const resolvers = {
-  Query: { books: () => books },
+  Query: { livres: () => livres, auteurs: () => auteurs },
 };
 
 // Put together a schema
